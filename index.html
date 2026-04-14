@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Hola España! - Mi Gran Libro de Español</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #fefce8; /* Un amarillo crema muy suave */
+        }
+        .bubbly-button {
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .bubbly-button:active {
+            transform: scale(0.9);
+        }
+        .category-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .hidden-section {
+            display: none;
+        }
+        .star-anim {
+            animation: bounce 0.5s infinite alternate;
+        }
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-5px); }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Top Bar -->
+    <nav class="bg-white shadow-sm p-4 sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <span class="text-3xl">🎒</span>
+                <h1 class="text-xl font-bold text-orange-600">Mi Español (我的西班牙语)</h1>
+            </div>
+            <div class="bg-yellow-100 px-4 py-1 rounded-full flex items-center gap-2 border border-yellow-300">
+                <span class="text-xl">⭐</span>
+                <span id="star-count" class="font-bold text-yellow-700 text-lg">0</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-5xl mx-auto p-4 md:p-8">
+        
+        <!-- Welcome Message -->
+        <div class="bg-orange-100 rounded-3xl p-6 mb-8 flex flex-col md:flex-row items-center gap-6 border-b-4 border-orange-200">
+            <div class="text-6xl">👋</div>
+            <div>
+                <h2 class="text-2xl font-bold text-orange-800">¡Hola! 你好 (Nǐ hǎo)</h2>
+                <p class="text-orange-700">Pulsa los botones para escuchar y aprender. ¡Diviértete! (点击按钮听声音并学习。玩得开心！)</p>
+            </div>
+        </div>
+
+        <!-- Category Selector -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+            <button onclick="changeView('vocab')" class="category-card bg-blue-500 text-white p-4 rounded-2xl text-center">
+                <div class="text-3xl mb-1">🍎</div>
+                <div class="font-bold">Vocabulario</div>
+                <div class="text-xs opacity-80">词汇</div>
+            </button>
+            <button onclick="changeView('frases')" class="category-card bg-green-500 text-white p-4 rounded-2xl text-center">
+                <div class="text-3xl mb-1">💬</div>
+                <div class="font-bold">Frases</div>
+                <div class="text-xs opacity-80">句子</div>
+            </button>
+            <button onclick="changeView('juego')" class="category-card bg-purple-500 text-white p-4 rounded-2xl text-center">
+                <div class="text-3xl mb-1">🎮</div>
+                <div class="font-bold">Jugar</div>
+                <div class="text-xs opacity-80">游戏</div>
+            </button>
+            <button onclick="changeView('escribir')" class="category-card bg-pink-500 text-white p-4 rounded-2xl text-center">
+                <div class="text-3xl mb-1">✍️</div>
+                <div class="font-bold">Escribir</div>
+                <div class="text-xs opacity-80">写</div>
+            </button>
+        </div>
+
+        <!-- Section: Vocabulary with Filters -->
+        <section id="section-vocab" class="content-section">
+            <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
+                <button onclick="filterVocab('todo')" class="bg-white border-2 border-blue-200 px-4 py-1 rounded-full text-sm font-bold hover:bg-blue-50">Todo</button>
+                <button onclick="filterVocab('cole')" class="bg-white border-2 border-blue-200 px-4 py-1 rounded-full text-sm font-bold hover:bg-blue-50">Colegio 🏫</button>
+                <button onclick="filterVocab('colores')" class="bg-white border-2 border-blue-200 px-4 py-1 rounded-full text-sm font-bold hover:bg-blue-50">Colores 🎨</button>
+                <button onclick="filterVocab('familia')" class="bg-white border-2 border-blue-200 px-4 py-1 rounded-full text-sm font-bold hover:bg-blue-50">Familia 👨‍👩‍👧</button>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4" id="vocab-display">
+                <!-- Injected via JS -->
+            </div>
+        </section>
+
+        <!-- Section: Phrases -->
+        <section id="section-frases" class="content-section hidden-section">
+            <h3 class="text-xl font-bold mb-6 text-green-800">Frases para usar hoy (今天要用的句子)</h3>
+            <div class="grid gap-4" id="phrases-display">
+                <!-- Injected via JS -->
+            </div>
+        </section>
+
+        <!-- Section: Mini Game -->
+        <section id="section-juego" class="content-section hidden-section">
+            <div class="bg-white rounded-3xl p-8 shadow-xl max-w-2xl mx-auto text-center border-t-8 border-purple-500">
+                <p class="text-gray-500 text-sm mb-2 uppercase tracking-widest font-bold">Reto del día</p>
+                <h3 id="game-quest" class="text-3xl font-bold mb-8 text-purple-700 underline decoration-wavy decoration-yellow-400">¿Dónde está...?</h3>
+                <div id="game-options" class="grid grid-cols-2 gap-4"></div>
+                <div id="game-msg" class="mt-6 text-xl font-bold h-8"></div>
+            </div>
+        </section>
+
+        <!-- Section: Writing Practice -->
+        <section id="section-escribir" class="content-section hidden-section">
+            <div class="bg-white rounded-3xl p-6 shadow-lg max-w-xl mx-auto">
+                <h3 class="text-xl font-bold mb-4 text-pink-700">Practica tu nombre (练习你的名字)</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-1">Escribe "Hola":</label>
+                        <input type="text" id="write-input" oninput="checkWriting()" class="w-full p-4 rounded-xl border-2 border-pink-100 focus:border-pink-400 outline-none text-2xl text-center" placeholder="...">
+                    </div>
+                    <div id="write-feedback" class="text-center text-4xl"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        const vocab = [
+            // Colegio
+            { es: "Libro", zh: "书", emoji: "📖", cat: "cole" },
+            { es: "Mochila", zh: "背包", emoji: "🎒", cat: "cole" },
+            { es: "Lápiz", zh: "铅笔", emoji: "✏️", cat: "cole" },
+            { es: "Pizarra", zh: "黑板", emoji: "🏢", cat: "cole" },
+            { es: "Silla", zh: "椅子", emoji: "🪑", cat: "cole" },
+            // Colores
+            { es: "Rojo", zh: "红色", emoji: "🔴", cat: "colores" },
+            { es: "Azul", zh: "蓝色", emoji: "🔵", cat: "colores" },
+            { es: "Amarillo", zh: "黄色", emoji: "🟡", cat: "colores" },
+            { es: "Verde", zh: "绿色", emoji: "🟢", cat: "colores" },
+            // Familia
+            { es: "Mamá", zh: "妈妈", emoji: "👩", cat: "familia" },
+            { es: "Papá", zh: "爸爸", emoji: "👨", cat: "familia" },
+            { es: "Hermano", zh: "兄弟", emoji: "👦", cat: "familia" },
+            { es: "Hermana", zh: "姐妹", emoji: "👧", cat: "familia" },
+            // Otros
+            { es: "Agua", zh: "水", emoji: "💧", cat: "todo" },
+            { es: "Manzana", zh: "苹果", emoji: "🍎", cat: "todo" },
+            { es: "Gato", zh: "猫", emoji: "🐱", cat: "todo" },
+            { es: "Perro", zh: "狗", emoji: "🐶", cat: "todo" },
+            { es: "Sol", zh: "太阳", emoji: "☀️", cat: "todo" }
+        ];
+
+        const frases = [
+            { es: "Me llamo...", zh: "我的名字是...", audio: "Me llamo" },
+            { es: "Tengo ocho años", zh: "我八岁了", audio: "Tengo ocho años" },
+            { es: "¿Cómo estás?", zh: "你好吗？", audio: "¿Cómo estás?" },
+            { es: "Muy bien, gracias", zh: "很好，谢谢", audio: "Muy bien, gracias" },
+            { es: "No entiendo", zh: "我不明白", audio: "No entiendo" },
+            { es: "Por favor", zh: "请", audio: "Por favor" }
+        ];
+
+        let stars = 0;
+
+        function speak(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'es-ES';
+            utterance.rate = 0.8;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function changeView(view) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden-section'));
+            document.getElementById('section-' + view).classList.remove('hidden-section');
+            if(view === 'juego') setupGame();
+        }
+
+        function renderVocab(list) {
+            const container = document.getElementById('vocab-display');
+            container.innerHTML = '';
+            list.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center hover:scale-105 transition-transform cursor-pointer";
+                div.onclick = () => speak(item.es);
+                div.innerHTML = `
+                    <span class="text-4xl mb-2">${item.emoji}</span>
+                    <p class="font-bold text-gray-800 text-sm">${item.es}</p>
+                    <p class="text-xs text-gray-400 font-medium">${item.zh}</p>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function filterVocab(cat) {
+            if(cat === 'todo') renderVocab(vocab);
+            else renderVocab(vocab.filter(v => v.cat === cat));
+        }
+
+        function renderPhrases() {
+            const container = document.getElementById('phrases-display');
+            frases.forEach(f => {
+                const div = document.createElement('div');
+                div.className = "bg-white p-4 rounded-2xl shadow-sm flex items-center justify-between border-l-8 border-green-400";
+                div.innerHTML = `
+                    <div>
+                        <p class="font-bold text-green-900 text-lg">"${f.es}"</p>
+                        <p class="text-sm text-gray-500 italic">${f.zh}</p>
+                    </div>
+                    <button onclick="speak('${f.audio}')" class="bg-green-50 p-3 rounded-full hover:bg-green-100 text-2xl">🔊</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        let targetGameItem = null;
+        function setupGame() {
+            const quest = document.getElementById('game-quest');
+            const options = document.getElementById('game-options');
+            const msg = document.getElementById('game-msg');
+            msg.innerText = "";
+            options.innerHTML = "";
+            
+            const shuffled = [...vocab].sort(() => 0.5 - Math.random()).slice(0, 4);
+            targetGameItem = shuffled[Math.floor(Math.random() * shuffled.length)];
+            
+            quest.innerText = `¿Dónde está: ${targetGameItem.es}?`;
+            speak(`¿Dónde está: ${targetGameItem.es}?`);
+
+            shuffled.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = "bg-gray-50 p-8 rounded-3xl text-5xl hover:bg-purple-50 border-4 border-transparent transition-all bubbly-button";
+                btn.innerHTML = item.emoji;
+                btn.onclick = () => {
+                    if(item.es === targetGameItem.es) {
+                        btn.classList.add('border-green-400', 'bg-green-50');
+                        msg.innerText = "¡SÍ! 太棒了! 🌟";
+                        msg.className = "mt-6 text-2xl font-bold text-green-500 star-anim";
+                        addStar();
+                        speak("¡Excelente!");
+                        setTimeout(setupGame, 1500);
+                    } else {
+                        btn.classList.add('border-red-200');
+                        msg.innerText = "Cerca... 再试一次 🧸";
+                        msg.className = "mt-6 text-xl font-bold text-red-400";
+                        speak("Cerca, intenta otra vez");
+                    }
+                };
+                options.appendChild(btn);
+            });
+        }
+
+        function addStar() {
+            stars++;
+            document.getElementById('star-count').innerText = stars;
+        }
+
+        function checkWriting() {
+            const val = document.getElementById('write-input').value.toLowerCase().trim();
+            const feedback = document.getElementById('write-feedback');
+            if(val === "hola") {
+                feedback.innerText = "✨ ¡PERFECTO! ✨";
+                addStar();
+                speak("Perfecto, hola");
+                setTimeout(() => {
+                    document.getElementById('write-input').value = "";
+                    feedback.innerText = "";
+                }, 2000);
+            }
+        }
+
+        // Init
+        renderVocab(vocab);
+        renderPhrases();
+    </script>
+</body>
+</html>
